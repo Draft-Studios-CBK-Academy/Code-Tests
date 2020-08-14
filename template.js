@@ -45,6 +45,7 @@ else{
  * returns something and functions properly
 */
 var cssParse = async () =>{
+/*
     //Search for errors
     cssErrors[0] = await cssParser.parse(cssPath, "p", "color: blue")
     cssErrors[1] = await cssParser.parse(cssPath, "h1", "color: blue")
@@ -55,5 +56,6 @@ var cssParse = async () =>{
     if(cssErrors[1] == false){
         process.stdout.write("There is an error in your css causing 'h1' not to be blue")
     }
+*/
 }
 cssParse()
