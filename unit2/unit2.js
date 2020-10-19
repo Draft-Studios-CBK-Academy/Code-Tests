@@ -6,14 +6,15 @@ var cssParser = require('./cssParser.js')//For parsing css code for errors
 var htmlErrors = []
 var fileErrors = []
 var cssErrors = []
-const cssPath = "styles.css"
-const htmlPaths = ["about.html","index.html","learn.html","people.html","resources.html"]
+const cssPath = 'styles.css'
+const htmlPaths = ['index.html','about.html','learn.html','people.html','resources.html']
 
 //Testing procedures for html go in this for loop
 htmlPaths.forEach(htmlPath => {
     //Check that each file exists
+    htmlErrors=[]
     if (!fs.existsSync(htmlPath)){
-        fileErrors.push(htmlPath+ " does not exist\n")
+        fileErrors.push(htmlPath+ ' does not exist, make sure you created the file and spelled it right.\n')
     }
     //Loading cheerio and using it to check for relevant tags
     else{
@@ -28,35 +29,40 @@ htmlPaths.forEach(htmlPath => {
         var doctype = ($.root().html());
         doctype = doctype.toLowerCase()
         doctype = doctype.slice(0,15)
-        if(doctype != "<!doctype html>"){
-            htmlErrors.push(htmlPath+": Doctype not found\n")
+        if(doctype != '<!doctype html>'){
+            htmlErrors.push(htmlPath+': \'Doctype\' not found, make sure you defined it at the top of the document.\n')
         }
-        if($("html").length <= 0){
-            htmlErrors.push(htmlPath+": No html tag found\n")
+        if($('html').length <= 0){
+            htmlErrors.push(htmlPath+': No html tag found, make sure you created it in the file and spelled it correctly.\n')
         }
-        if($("head").length <= 0){
-            htmlErrors.push(htmlPath+": No head tag found\n")
+        if($('head').length <= 0){
+            htmlErrors.push(htmlPath+': No head tag found, make sure you created it in the file and spelled it correctly.\n')
         }
-        if($("title").length <= 0){
-            htmlErrors.push(htmlPath+": No title tag found\n")
+        if($('title').length <= 0){
+            htmlErrors.push(htmlPath+': No title tag found, make sure you created it in the file and spelled it correctly.\n')
         }
-        if($("link").length <= 0){
-            htmlErrors.push(htmlPath+": No link tag found\n")
+        if($('link').length <= 1){
+            if($('link').attr('rel') != 'stylesheet'){
+                htmlErrors.push(htmlPath+': link tag attribute "rel" not set to "stylesheet"\n')
+            }
+            if($('link').attr('href') != 'styles.css'){
+                htmlErrors.push(htmlPath+': link tag attribute "href" not set to "styles.css"\n')
+            }
         }
-        if($("body").length <= 0){
-            htmlErrors.push(htmlPath+": No body tag found\n")
+        if($('body').length <= 0){
+            htmlErrors.push(htmlPath+': No body tag found, make sure you created it in the file and spelled it correctly.\n')
         }    
+    if(htmlErrors.length <= 0) {
+        console.log(htmlPath+': No Errors in html code checked.');
+    }
+    else{
+        htmlErrors.forEach(error => process.stdout.write(error))
+    }
         
     }
 })
 
 //Print errors if there are any
-if(htmlErrors.length <= 0) {
-    console.log("No Errors in html");
-}
-else{
-    htmlErrors.forEach(error => process.stdout.write(error))
-}
 if(fileErrors.length > 0) {
     fileErrors.forEach(error => process.stdout.write(error))
 }
