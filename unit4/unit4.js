@@ -6,17 +6,18 @@ var cssParser = require('../cssParser.js')//For parsing css code for errors
 var htmlErrors = []
 var fileErrors = []
 var cssErrors = []
-const cssPath = "styles.css"
-const htmlPaths = ["about.html","index.html","learn.html","people.html","resources.html"]
+const cssPath = 'styles.css'
+const htmlPaths = ['about.html','index.html','learn.html','people.html','resources.html']
 
 //Testing procedures for html go in this for loop
 htmlPaths.forEach(htmlPath => {
     //Check that each file exists
     if (!fs.existsSync(htmlPath)){
-        fileErrors.push(htmlPath+ " does not exist\n")
+        fileErrors.push(htmlPath+ ' does not exist\n')
     }
     //Loading cheerio and using it to check for relevant tags
     else{
+        let googleFont = false
         const $ = cheerio.load(fs.readFileSync(htmlPath), {
             ignoreWhitespace: true,
             xmlMode: true,
@@ -28,41 +29,79 @@ htmlPaths.forEach(htmlPath => {
         var doctype = ($.root().html());
         doctype = doctype.toLowerCase()
         doctype = doctype.slice(0,15)
-        if(doctype != "<!doctype html>"){
-            htmlErrors.push(htmlPath+": Doctype not found\n")
+        if(doctype != '<!doctype html>'){
+            htmlErrors.push(htmlPath+': Doctype not found\n')
         }
-        if($("html").length <= 0){
-            htmlErrors.push(htmlPath+": No html tag found\n")
+        if($('div').length <= 0){
+            htmlErrors.push(htmlPath+': No "div" tag found, make sure you created it in the file, spelled it right, and closed the tag.\n')
         }
-        if($("head").length <= 0){
-            htmlErrors.push(htmlPath+": No head tag found\n")
+        if($('div').length <= 1){
+            if($('div').attr('class') != 'landing-section'){
+                htmlErrors.push(htmlPath+': class attribute in div not set to "landing section"\n')
+            }
+            switch(htmlPath){
+                case 'index.html':
+                        if($('div').attr('id') != 'home-landing'){
+                            htmlErrors.push(htmlPath+': id attribute in div not set to "home-landing"\n')
+                        }
+                    break;
+                case 'about.html':
+                        if($('div').attr('id') != 'about-landing'){
+                            htmlErrors.push(htmlPath+': id attribute in div not set to "about-landing"\n')
+                        }
+                    break;
+                case 'people.html':
+                        if($('div').attr('id') != 'people-landing'){
+                            htmlErrors.push(htmlPath+': id attribute in div not set to "people-landing"\n')
+                        }
+                    break;
+                case 'learn.html':
+                        if($('div').attr('id') != 'learn-landing'){
+                            htmlErrors.push(htmlPath+': id attribute in div not set to "learn-landing"\n')
+                        }
+                    break;
+                case 'resources.html':
+                        if($('div').attr('id') != 'resources-landing'){
+                            htmlErrors.push(htmlPath+': id attribute in div not set to "resources-landing"\n')
+                        }
+                    break;
+            }
         }
-        if($("title").length <= 0){
-            htmlErrors.push(htmlPath+": No title tag found\n")
+        if($('h1').length <= 0){
+            htmlErrors.push(htmlPath+': No "h1" tag found, make sure you created it in the file, spelled it right, and closed the tag.\n')
         }
-        if($("link").length <= 0){
-            htmlErrors.push(htmlPath+": No link tag found\n")
+        if($('link').length <= 0){
+            htmlErrors.push(htmlPath+': No "link" tag found, make sure you created it in the file, spelled it right, and closed the tag.\n')
         }
-        if($("body").length <= 0){
-            htmlErrors.push(htmlPath+": No body tag found\n")
+        $('link').each((i, link) => {
+            const href = link.attribs.href.toLowerCase()
+            if(href.startsWith('https://fonts.googleapis.com/') == true){
+                googleFont = true;
+            }
+        })
+        if(googleFont == false){
+            htmlErrors.push(htmlPath+': No link tag found with google fonts api in file. Make sure you created the tag and that the link begins with "https://fonts.googleapis.com/"\n')
+        }
+        if($('head').length <= 0){
+            htmlErrors.push(htmlPath+': No head tag found\n')
+        }
+        if($('title').length <= 0){
+            htmlErrors.push(htmlPath+': No title tag found\n')
+        }
+        if($('body').length <= 0){
+            htmlErrors.push(htmlPath+': No body tag found\n')
         }    
-        if($("div.container").length <= 0){
-            htmlErrors.push(htmlPath+": No div tag with class 'container' found\n")
-        }    
-        if($("h1").length <= 0){
-            htmlErrors.push(htmlPath+": No h1 tag found\n")
-        }    
+    if(htmlErrors.length <= 0) {
+        console.log(htmlPath+': No Errors in html code checked.');
+    }
+    else{
+        htmlErrors.forEach(error => process.stdout.write(error))
+    }
         
     }
 })
 
 //Print errors if there are any
-if(htmlErrors.length <= 0) {
-    console.log("No Errors in html");
-}
-else{
-    htmlErrors.forEach(error => process.stdout.write(error))
-}
 if(fileErrors.length > 0) {
     fileErrors.forEach(error => process.stdout.write(error))
 }
@@ -74,16 +113,41 @@ if(fileErrors.length > 0) {
 */
 var cssParse = async () =>{
     //Search for errors
-    /*
-    cssErrors[0] = await cssParser.parse(cssPath, "p", "color: blue")
-    cssErrors[1] = await cssParser.parse(cssPath, "h1", "color: blue")
+    let selectors = ['#home-landing','#about-landing', '#people-landing','#learn-landing','#resources-landing']
+    for(const selector in selectors){
+        //Check for errors for ID's
+        cssErrors[0] = await cssParser.exists(cssPath, selectors[selector], 'background-image')
+        if(cssErrors[0] == false){
+            process.stdout.write('Css Error: '+'attribute "background-image" cannot be found for '+selectors[selector]+'\n')}
+    }
+    //Check errors for landing-section
+        let selector = '.landing-section'
+        cssErrors[0] = await cssParser.exists(cssPath,selector, 'width')
+        cssErrors[1] = await cssParser.exists(cssPath,selector, 'height')
+        cssErrors[2] = await cssParser.exists(cssPath,selector, 'border')
+        cssErrors[3] = await cssParser.exists(cssPath,selector, 'background-size')
+        cssErrors[4] = await cssParser.exists(cssPath,selector, 'background-repeat')
+        if(cssErrors[0] == false){
+            process.stdout.write('Css Error: '+'attribute "width" cannot be found for '+selector+'\n')}
+        if(cssErrors[1] == false){
+            process.stdout.write('Css Error: '+'attribute "height" cannot be found for '+selector+'\n')}
+        if(cssErrors[2] == false){
+            process.stdout.write('Css Error: '+'attribute "border" cannot be found for '+selector+'\n')}
+        if(cssErrors[3] == false){
+            process.stdout.write('Css Error: '+'attribute "background-size" cannot be found for '+selector+'\n')}
+        if(cssErrors[4] == false){
+            process.stdout.write('Css Error: '+'attribute "background-repeat" cannot be found for '+selector+'\n')}
+    //Check errors for h1
+        selector = 'h1'
+        cssErrors[0] = await cssParser.exists(cssPath,selector, 'color')
+        cssErrors[1] = await cssParser.exists(cssPath,selector, 'font-family')
+        cssErrors[2] = await cssParser.exists(cssPath,selector, 'padding')
+        if(cssErrors[0] == false){
+            process.stdout.write('Css Error: '+'attribute "color" cannot be found for '+selector+'\n')}
+        if(cssErrors[1] == false){
+            process.stdout.write('Css Error: '+'attribute "font-family" cannot be found for '+selector+'\n')}
+        if(cssErrors[2] == false){
+            process.stdout.write('Css Error: '+'attribute "padding" cannot be found for '+selector+'\n')}
     //Return relevant error messages, 'false' means an error was detect, 'true' means the code is good
-    if(cssErrors[0] == false){
-        process.stdout.write("There is an error in your css causing 'p' not to be blue")
-    }
-    if(cssErrors[1] == false){
-        process.stdout.write("There is an error in your css causing 'h1' not to be blue")
-    }
-    */
 }
 cssParse()

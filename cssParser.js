@@ -46,6 +46,43 @@ exports.parse = async (file, tag, attr) => {
     var result = await promise;
     return result
 }
+exports.exists = async (file, tag, attr) => {
+    var tagSearched = escapeRegExp(tag + "{" );
+    var tagFound = false;
+    var attrSearched = escapeRegExp(attr);
+    var promise = new Promise((resolve, reject) =>{
+        lineReader.eachLine(file, (line, last) =>{
+            if(line.includes('{')){
+                if(escapeRegExp(line) === tagSearched){
+                    tagFound = true;
+                }
+            }
+            //If the tag is found and the attribute exists return true
+            if(tagFound === true){
+                if(escapeRegExp(line).startsWith(attrSearched)){
+                    //console.log("orig: "+escapeRegExp(line) )
+                    //console.log("sear: "+attrSearched )
+                    resolve(true)
+                }
+            }
+            //If the tag is found and the attribute is not return false
+            if(tagFound === true && line.includes('}')){
+                reject(false)
+            }
+            //If the tag is not found return false
+            if(last){
+                reject(false)
+            }
+        })
+    }).then(() => {
+        cssValid = true
+        return true
+    }).catch(() => {
+        return false
+    })
+    var result = await promise;
+    return result
+}
 
 /* Use Cases
  * The tag is correct and the attribute is correct
