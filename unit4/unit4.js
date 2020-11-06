@@ -127,27 +127,10 @@ var cssParse = async () =>{
         cssErrors[2] = await cssParser.exists(cssPath,selector, 'border')
         cssErrors[3] = await cssParser.exists(cssPath,selector, 'background-size')
         cssErrors[4] = await cssParser.exists(cssPath,selector, 'background-repeat')
-        if(cssErrors[0] == false){
-            process.stdout.write('Css Error: '+'attribute "width" cannot be found for '+selector+'\n')}
-        if(cssErrors[1] == false){
-            process.stdout.write('Css Error: '+'attribute "height" cannot be found for '+selector+'\n')}
-        if(cssErrors[2] == false){
-            process.stdout.write('Css Error: '+'attribute "border" cannot be found for '+selector+'\n')}
-        if(cssErrors[3] == false){
-            process.stdout.write('Css Error: '+'attribute "background-size" cannot be found for '+selector+'\n')}
-        if(cssErrors[4] == false){
-            process.stdout.write('Css Error: '+'attribute "background-repeat" cannot be found for '+selector+'\n')}
     //Check errors for h1
         selector = 'h1'
         cssErrors[0] = await cssParser.exists(cssPath,selector, 'color')
         cssErrors[1] = await cssParser.exists(cssPath,selector, 'font-family')
         cssErrors[2] = await cssParser.exists(cssPath,selector, 'padding')
-        if(cssErrors[0] == false){
-            process.stdout.write('Css Error: '+'attribute "color" cannot be found for '+selector+'\n')}
-        if(cssErrors[1] == false){
-            process.stdout.write('Css Error: '+'attribute "font-family" cannot be found for '+selector+'\n')}
-        if(cssErrors[2] == false){
-            process.stdout.write('Css Error: '+'attribute "padding" cannot be found for '+selector+'\n')}
-    //Return relevant error messages, 'false' means an error was detect, 'true' means the code is good
 }
 cssParse()
