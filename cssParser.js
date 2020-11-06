@@ -81,6 +81,9 @@ exports.exists = async (file, tag, attr) => {
         return false
     })
     var result = await promise;
+    if(result == false){
+        process.stdout.write('Css Error: '+'attribute '+ '"'+attr+'"' +' cannot be found for css selector: '+tag+'\n')
+    }
     return result
 }
 
