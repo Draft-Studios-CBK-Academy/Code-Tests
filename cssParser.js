@@ -11,6 +11,7 @@ function escapeRegExp(stringToGoIntoTheRegex) {
 //Regular expression used to edit strings to ensure matching formats
 var cssOpen = new RegExp('([\\s\\S]*?){', 'gi');//([\\s\\S]*?)}', 'gi');
 
+//I believe this is deprecated but leaving for fear that it's still being used somewhere, don't use this one
 exports.parse = async (file, tag, attr) => {
     var tagSearched = escapeRegExp(tag + "{" );
     var tagFound = false;
@@ -46,6 +47,7 @@ exports.parse = async (file, tag, attr) => {
     var result = await promise;
     return result
 }
+//Checks if a css selector has the correct attribute
 exports.exists = async (file, tag, attr) => {
     var tagSearched = escapeRegExp(tag + "{" );
     var tagFound = false;
@@ -86,6 +88,7 @@ exports.exists = async (file, tag, attr) => {
     }
     return result
 }
+//The same as "exists" but does not print the output
 exports.existsNoPrint = async (file, tag, attr) => {
     var tagSearched = escapeRegExp(tag + "{" );
     var tagFound = false;
@@ -122,6 +125,38 @@ exports.existsNoPrint = async (file, tag, attr) => {
     })
     var result = await promise;
     if(result == false){
+    }
+    return result
+}
+//Checks for a css selector in the file
+exports.tagExists = async (file, tag) => {
+    var tagSearched = escapeRegExp(tag + "{" );
+    var tagFound = false;
+    var promise = new Promise((resolve, reject) =>{
+        lineReader.eachLine(file, (line, last) =>{
+            if(line.includes('{')){
+                if(escapeRegExp(line) === tagSearched){
+                    tagFound = true;
+                }
+            }
+            //If the tag is found return true
+            if(tagFound === true){
+                resolve(true)
+            } 
+            //If the tag is not found return false
+            if(last){
+                reject(false)
+            }
+        })
+    }).then(() => {
+        cssValid = true
+        return true
+    }).catch(() => {
+        return false
+    })
+    var result = await promise;
+    if(result == false){
+        process.stdout.write('Css Error: css selector "'+tag+'" could not be found\n')
     }
     return result
 }
