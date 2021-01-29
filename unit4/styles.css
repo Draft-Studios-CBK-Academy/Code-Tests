@@ -1,0 +1,28 @@
+#home-landing{
+    background-image: url();
+}
+#about-landing{
+    background-image: url();
+}
+#people-landing{
+    background-image: url();
+}
+#learn-landing{
+    background-image: url();
+}
+#resources-landing{
+    background-image: url();
+}
+.landing-section{
+    width: 30px;
+    height:30px;
+    border: 2px;
+    background-size: auto;
+    background: url();
+    background-repeat: repeat-y;
+}
+h1{
+    color: blue;
+    font-family: comic-sans;
+    padding: 30px;
+}

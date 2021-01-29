@@ -1,0 +1,14 @@
+#navigation-bar{
+    background-color: blue;
+    height: 100%;
+    padding: 10px;
+}
+
+a{
+    color: red;
+    font-family: random;
+    font-size: 20px;
+    padding: 30px;
+    margin: 30px;
+    border: 50px;
+}
